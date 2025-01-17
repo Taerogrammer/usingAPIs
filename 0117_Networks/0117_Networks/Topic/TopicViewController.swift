@@ -1,0 +1,17 @@
+//
+//  TopicViewController.swift
+//  0117_Networks
+//
+//  Created by 김태형 on 1/17/25.
+//
+
+import UIKit
+
+class TopicViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .yellow
+    }
+}
