@@ -13,6 +13,7 @@ final class PictureSearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
+//    private let collectionView = UICollectionView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
