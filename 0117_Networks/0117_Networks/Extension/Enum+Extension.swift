@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 버튼 색상을 기준으로 영어 문자열로 반환
 enum ColorOption: String {
     case 블랙
     case 화이트
@@ -27,4 +28,11 @@ enum ColorOption: String {
         case .블루: return "blue"
         }
     }
+}
+
+/// API 리스트
+enum SplashAPI: String {
+    case topic = "https://api.unsplash.com/topics/"
+    case search = "https://api.unsplash.com/search/photos?"
+    case detail = "https://api.unsplash.com/photos/"
 }

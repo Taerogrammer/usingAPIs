@@ -16,6 +16,13 @@ final class PictureSearchViewController: UIViewController {
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createItemCollectionViewLayout())
     private var selectedButton: UIButton?
 
+    private var pictureSearch: PictureSearch?
+    var items: [PictureResult]? {
+        didSet {
+            self.collectionView.reloadData()
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(),configureLayout(), configureView(), configureScrollButton(), configureDelegate()].forEach { $0 }
@@ -107,12 +114,16 @@ extension PictureSearchViewController: ViewCofiguration {
 // MARK: collectionView
 extension PictureSearchViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(#function, dummyData.results.count)
-        return dummyData.results.count
+
+        return items?.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PictureSearchCollectionViewCell.id, for: indexPath) as! PictureSearchCollectionViewCell
+
+        if let picture = pictureSearch?.results[indexPath.item] {
+            cell.configureItem(with: picture)
+        }
 
         return cell
     }
@@ -132,8 +143,20 @@ extension PictureSearchViewController: DelegateConfiguration {
 // MARK: SearchBar Delegate
 extension PictureSearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print(#function, searchBar.text)
+        print(#function, searchBar.text!)
         resetButton()
+
+        NetworkManager.shared.fetchItem(query: searchBar.text!, page: 1) { [weak self] result in
+            switch result {
+            case .success(let value):
+                print("성공", value)
+                self?.pictureSearch = value
+                self?.items = self?.pictureSearch?.results ?? []
+            case .failure(let error):
+                print("error ", error)
+            }
+        }
+
         view.endEditing(true)
     }
 }

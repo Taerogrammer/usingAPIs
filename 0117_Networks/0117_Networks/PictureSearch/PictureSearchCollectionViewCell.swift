@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class PictureSearchCollectionViewCell: UICollectionViewCell {
     static let id = "PictureSearchCollectionViewCell"
@@ -23,8 +24,6 @@ final class PictureSearchCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-
 }
 
 extension PictureSearchCollectionViewCell: ViewCofiguration {
@@ -47,21 +46,25 @@ extension PictureSearchCollectionViewCell: ViewCofiguration {
     
     func configureView() {
         imgView.backgroundColor = .red
-        starButton.setTitle("asdas", for: .normal)
+        imgView.contentMode = .scaleToFill
+        starButton.setTitle("", for: .normal)
         starButton.titleLabel?.font = .systemFont(ofSize: 12)
-        starButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+        starButton.setImage(UIImage(systemName: "star.fill"), for: .disabled)
         starButton.tintColor = .yellow
         starButton.clipsToBounds = true
         starButton.layer.cornerRadius = 12
         starButton.backgroundColor = .gray
         starButton.contentEdgeInsets = .init(top: 8, left: 14, bottom: 8, right: 14)
+        starButton.isEnabled = false
 
         likeImageView.image = UIImage(systemName: "heart.circle")
         likeImageView.clipsToBounds = true
         likeImageView.layer.cornerRadius = 22
         likeImageView.tintColor = .white
-        
     }
-    
-
+    func configureItem(with row: PictureResult) {
+        let url = URL(string: row.urls.full)
+        imgView.kf.setImage(with: url)
+        starButton.setTitle("\(row.likes)", for: .normal)
+    }
 }
