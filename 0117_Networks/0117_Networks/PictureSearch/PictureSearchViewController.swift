@@ -9,6 +9,8 @@ import UIKit
 import Alamofire
 import SnapKit
 
+//TODO: searchBar.text! 수정
+
 final class PictureSearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let scrollView = UIScrollView()
@@ -22,6 +24,7 @@ final class PictureSearchViewController: UIViewController {
             self.collectionView.reloadData()
         }
     }
+    private var page = 1
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,11 +148,10 @@ extension PictureSearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         print(#function, searchBar.text!)
         resetButton()
-
-        NetworkManager.shared.fetchItem(query: searchBar.text!, page: 1) { [weak self] result in
+        resetPage()
+        NetworkManager.shared.fetchItem(query: searchBar.text!, page: self.page) { [weak self] result in
             switch result {
             case .success(let value):
-                print("성공", value)
                 self?.pictureSearch = value
                 self?.items = self?.pictureSearch?.results ?? []
             case .failure(let error):
@@ -174,7 +176,17 @@ extension PictureSearchViewController {
               let colorOption = ColorOption(rawValue: koreanTitle) else { return }
 
         let english = colorOption.englishColor
-        print("english ", english)
+        resetPage()
+        NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, color: english) { [weak self] result in
+            switch result {
+            case .success(let value):
+//                print("success -> ", value)
+                self?.pictureSearch = value
+                self?.items = self?.pictureSearch?.results ?? []
+            case .failure(let error):
+                print("error ", error)
+            }
+        }
     }
 }
 
@@ -186,4 +198,10 @@ extension PictureSearchViewController {
         selectedButton?.backgroundColor = .systemGray5
         selectedButton = nil
     }
+
+    // 페이지 리셋
+    private func resetPage() {
+        self.page = 1
+    }
+
 }
