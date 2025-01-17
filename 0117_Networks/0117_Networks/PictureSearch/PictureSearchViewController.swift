@@ -13,18 +13,18 @@ final class PictureSearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
-//    private let collectionView = UICollectionView()
+    lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createItemCollectionViewLayout())
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        [configureHierarchy(),configureLayout(), configureView(), configureScrollButton()].forEach { $0 }
+        [configureHierarchy(),configureLayout(), configureView(), configureScrollButton(), configureDelegate()].forEach { $0 }
     }
 }
 
 // MARK: UI
 extension PictureSearchViewController: ViewCofiguration {
     func configureHierarchy() {
-        [searchBar, scrollView].forEach { view.addSubview($0) }
+        [searchBar, scrollView, collectionView].forEach { view.addSubview($0) }
         scrollView.addSubview(stackView)
     }
     
@@ -41,6 +41,10 @@ extension PictureSearchViewController: ViewCofiguration {
         stackView.snp.makeConstraints { make in
             make.edges.equalTo(scrollView)
             make.height.equalTo(44)
+        }
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(scrollView.snp.bottom)
+            make.bottom.horizontalEdges.equalToSuperview()
         }
     }
     
@@ -81,4 +85,42 @@ extension PictureSearchViewController: ViewCofiguration {
             stackView.addArrangedSubview($0)
         }
     }
+
+    private func createItemCollectionViewLayout() -> UICollectionViewFlowLayout {
+        let sectionInsets: CGFloat = 4
+        let cellSpacing: CGFloat = 2
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        let deviceWidth = UIScreen.main.bounds.width
+        let cellWidth = deviceWidth - (sectionInsets * 4) - cellSpacing
+
+        layout.itemSize = CGSize(width: cellWidth / 2, height: cellWidth / 1.5)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: sectionInsets, bottom: 0, right: sectionInsets)
+
+        return layout
+    }
+}
+
+// MARK: collectionView
+extension PictureSearchViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(#function, dummyData.results.count)
+        return dummyData.results.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PictureSearchCollectionViewCell.id, for: indexPath) as! PictureSearchCollectionViewCell
+
+        return cell
+    }
+}
+
+// MARK: Delegate
+extension PictureSearchViewController: DelegateConfiguration {
+    func configureDelegate() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(PictureSearchCollectionViewCell.self, forCellWithReuseIdentifier: PictureSearchCollectionViewCell.id)
+    }
+
 }

@@ -10,3 +10,7 @@ protocol ViewCofiguration {
     func configureLayout()
     func configureView()
 }
+
+protocol DelegateConfiguration {
+    func configureDelegate()
+}
