@@ -132,12 +132,22 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
     }
 }
 
+// MARK: Collection View Prefetching
+extension PictureSearchViewController: UICollectionViewDataSourcePrefetching {
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        for item in indexPaths {
+            print(#function, item.row)
+        }
+    }
+}
+
 // MARK: Delegate
 extension PictureSearchViewController: DelegateConfiguration {
     func configureDelegate() {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(PictureSearchCollectionViewCell.self, forCellWithReuseIdentifier: PictureSearchCollectionViewCell.id)
+        collectionView.prefetchDataSource = self
         searchBar.delegate = self
     }
 
@@ -200,8 +210,5 @@ extension PictureSearchViewController {
     }
 
     // 페이지 리셋
-    private func resetPage() {
-        self.page = 1
-    }
-
+    private func resetPage() { self.page = 1 }
 }
