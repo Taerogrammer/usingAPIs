@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PictureSearch {
+struct PictureSearch: Decodable {
     let totalPages: Int
     let results: [PictureResult]
 
@@ -17,7 +17,7 @@ struct PictureSearch {
     }
 }
 
-struct PictureResult {
+struct PictureResult: Decodable {
     let id: String
     let urls: PictureURL
     let likes: Int
@@ -31,7 +31,7 @@ struct PictureResult {
     }
 }
 
-struct PictureURL {
+struct PictureURL: Decodable {
     let full: String
 }
 
@@ -54,6 +54,42 @@ let dummyData = PictureSearch(
         ),
         PictureResult(
             id: "3",
+            urls: PictureURL(full: "https://example.com/image3.jpg"),
+            likes: 42,
+            likedByUser: false
+        ),
+        PictureResult(
+            id: "4",
+            urls: PictureURL(full: "https://example.com/image1.jpg"),
+            likes: 15,
+            likedByUser: false
+        ),
+        PictureResult(
+            id: "5",
+            urls: PictureURL(full: "https://example.com/image2.jpg"),
+            likes: 27,
+            likedByUser: true
+        ),
+        PictureResult(
+            id: "6",
+            urls: PictureURL(full: "https://example.com/image3.jpg"),
+            likes: 42,
+            likedByUser: false
+        ),
+        PictureResult(
+            id: "7",
+            urls: PictureURL(full: "https://example.com/image1.jpg"),
+            likes: 15,
+            likedByUser: false
+        ),
+        PictureResult(
+            id: "8",
+            urls: PictureURL(full: "https://example.com/image2.jpg"),
+            likes: 27,
+            likedByUser: true
+        ),
+        PictureResult(
+            id: "9",
             urls: PictureURL(full: "https://example.com/image3.jpg"),
             likes: 42,
             likedByUser: false

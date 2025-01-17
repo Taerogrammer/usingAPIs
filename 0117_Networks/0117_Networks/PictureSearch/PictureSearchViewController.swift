@@ -14,6 +14,7 @@ final class PictureSearchViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createItemCollectionViewLayout())
+    private var selectedButton: UIButton?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,9 +71,11 @@ extension PictureSearchViewController: ViewCofiguration {
         button.clipsToBounds = true
         button.layer.cornerRadius = 8
         button.backgroundColor = .systemGray5
+        button.addTarget(self, action: #selector(scrollButtonTapped(_:)), for: .touchUpInside)
 
         return button
     }
+
     private func configureScrollButton() {
         let blackButton = ScrollButton(title: "블랙", tintColor: .black)
         let whiteButton = ScrollButton(title: "화이트", tintColor: .white)
@@ -121,6 +124,43 @@ extension PictureSearchViewController: DelegateConfiguration {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(PictureSearchCollectionViewCell.self, forCellWithReuseIdentifier: PictureSearchCollectionViewCell.id)
+        searchBar.delegate = self
     }
 
+}
+
+// MARK: SearchBar Delegate
+extension PictureSearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        print(#function, searchBar.text)
+        resetButton()
+        view.endEditing(true)
+    }
+}
+
+// MARK: @objc
+extension PictureSearchViewController {
+
+    @objc private func scrollButtonTapped(_ sender: UIButton) {
+        if selectedButton == sender { return }
+        selectedButton?.backgroundColor = .systemGray5
+        sender.backgroundColor = .gray
+        selectedButton = sender
+
+        guard let koreanTitle = sender.currentTitle,
+              let colorOption = ColorOption(rawValue: koreanTitle) else { return }
+
+        let english = colorOption.englishColor
+        print("english ", english)
+    }
+}
+
+// MARK: Method
+extension PictureSearchViewController {
+
+    // 검색어 입력 시 클릭된 버튼 초기화
+    private func resetButton() {
+        selectedButton?.backgroundColor = .systemGray5
+        selectedButton = nil
+    }
 }
