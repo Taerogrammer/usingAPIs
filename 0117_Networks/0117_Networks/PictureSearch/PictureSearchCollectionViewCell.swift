@@ -63,7 +63,7 @@ extension PictureSearchCollectionViewCell: ViewConfiguration {
         likeImageView.tintColor = .white
     }
     func configureItem(with row: PictureResult) {
-        let url = URL(string: row.urls.full)
+        let url = URL(string: row.urls.raw)
         imgView.kf.setImage(with: url)
         starButton.setTitle("\(row.likes)", for: .normal)
     }
