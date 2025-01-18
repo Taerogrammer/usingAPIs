@@ -130,6 +130,19 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
 
         return cell
     }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let selectedPicture = items?[indexPath.item] else { return }
+        let detailVC = PictureDetailViewController()
+
+        NetworkManager.shared.fetchPhotoDetail(photoId: selectedPicture.id) { result in
+            switch result {
+            case .success(let value):
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            case .failure(let error):
+                print("error -> ", error)
+            }
+        }
+    }
 }
 
 // MARK: Collection View Prefetching

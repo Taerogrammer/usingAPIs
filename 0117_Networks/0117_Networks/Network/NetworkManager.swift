@@ -35,4 +35,15 @@ final class NetworkManager {
             }
     }
 
+    // detail
+    func fetchPhotoDetail(photoId: String, completion: @escaping (Result<PhotoDetail, Error>) -> Void) {
+        let url = "https://api.unsplash.com/photos/\(photoId)/statistics?client_id=\(APIKey.unsplash.rawValue)"
+        print(#function, url)
+
+        AF.request(url, method: .get)
+            .responseDecodable(of: PhotoDetail.self) { response in
+                completion(response.result.mapError { $0 as Error })
+            }
+    }
+
 }

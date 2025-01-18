@@ -11,7 +11,6 @@ class PictureDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
     }
 
 }
