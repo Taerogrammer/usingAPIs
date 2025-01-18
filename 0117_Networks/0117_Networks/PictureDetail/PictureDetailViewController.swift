@@ -15,9 +15,11 @@ final class PictureDetailViewController: UIViewController {
     private let contentView = UIView()
 
     private let imageView = UIImageView()
-    private let likesLabel = UILabel()
+    private let infoLabel = UILabel()
     private let downloadsLabel = UILabel()
+    private let downloadsText = UILabel()
     private let viewsLabel = UILabel()
+    private let viewsText = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +32,7 @@ extension PictureDetailViewController: ViewConfiguration {
     func configureHierarchy() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        [imageView, likesLabel, downloadsLabel, viewsLabel].forEach { contentView.addSubview($0) }
+        [imageView, infoLabel, downloadsLabel, downloadsText, viewsLabel, viewsText].forEach { contentView.addSubview($0) }
     }
     
     func configureLayout() {
@@ -45,25 +47,47 @@ extension PictureDetailViewController: ViewConfiguration {
             make.top.equalTo(contentView)
             make.width.equalTo(contentView)
         }
-        likesLabel.snp.makeConstraints { make in
+        infoLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(20)
+            make.leading.equalTo(contentView).inset(20)
+        }
+        viewsLabel.snp.makeConstraints { make in
+            make.leading.equalTo(infoLabel.snp.trailing).offset(44)
+            make.centerY.equalTo(infoLabel)
+        }
+        viewsText.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(24)
+            make.centerY.equalTo(viewsLabel)
+        }
+        downloadsLabel.snp.makeConstraints { make in
+            make.leading.equalTo(viewsLabel)
+            make.top.equalTo(viewsLabel.snp.bottom).offset(24)
             make.bottom.equalTo(contentView).inset(20)
         }
-
+        downloadsText.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().inset(24)
+            make.centerY.equalTo(downloadsLabel)
+        }
     }
     
     func configureView() {
-        scrollView.backgroundColor = .blue
-        contentView.backgroundColor = .red
+//        scrollView.backgroundColor = .blue
+//        contentView.backgroundColor = .red
         imageView.contentMode = .scaleAspectFill
+        infoLabel.text = "정보"
+        infoLabel.font = .boldSystemFont(ofSize: 24)
+        viewsLabel.text = "조회수"
+        viewsLabel.font = .boldSystemFont(ofSize: 14)
+        viewsText.font = .systemFont(ofSize: 14)
+        downloadsLabel.text = "다운로드"
+        downloadsLabel.font = .boldSystemFont(ofSize: 14)
+        downloadsText.font = .systemFont(ofSize: 14)
     }
 
     func configureItem(with item: PictureResult, detail: PhotoDetail) {
         let imageURL = URL(string: item.urls.small)
         imageView.kf.setImage(with: imageURL)
-
-        likesLabel.text = "좋아요 \(item.likes)"
-        downloadsLabel.text = "다운로드 \(detail.downloads.total)"
-        viewsLabel.text = "조회 수 \(detail.views.total)"
+        downloadsText.text = "\(detail.downloads.total.formatted())"
+        viewsText.text = "\(detail.views.total.formatted())"
     }
 }
