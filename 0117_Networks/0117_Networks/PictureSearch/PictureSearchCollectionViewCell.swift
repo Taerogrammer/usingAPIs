@@ -26,7 +26,7 @@ final class PictureSearchCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension PictureSearchCollectionViewCell: ViewCofiguration {
+extension PictureSearchCollectionViewCell: ViewConfiguration {
     func configureHierarchy() {
         [imgView, starButton, likeImageView].forEach { addSubview($0) }
     }

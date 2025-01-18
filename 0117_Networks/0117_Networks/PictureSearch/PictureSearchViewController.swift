@@ -33,7 +33,7 @@ final class PictureSearchViewController: UIViewController {
 }
 
 // MARK: UI
-extension PictureSearchViewController: ViewCofiguration {
+extension PictureSearchViewController: ViewConfiguration {
     func configureHierarchy() {
         [searchBar, scrollView, collectionView].forEach { view.addSubview($0) }
         scrollView.addSubview(stackView)
@@ -137,6 +137,7 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
         NetworkManager.shared.fetchPhotoDetail(photoId: selectedPicture.id) { result in
             switch result {
             case .success(let value):
+                detailVC.configureItem(with: selectedPicture, detail: value)
                 self.navigationController?.pushViewController(detailVC, animated: true)
             case .failure(let error):
                 print("error -> ", error)

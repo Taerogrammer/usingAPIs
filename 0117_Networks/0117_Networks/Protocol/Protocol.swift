@@ -5,7 +5,7 @@
 //  Created by 김태형 on 1/17/25.
 //
 
-protocol ViewCofiguration {
+protocol ViewConfiguration {
     func configureHierarchy()
     func configureLayout()
     func configureView()
