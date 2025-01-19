@@ -235,7 +235,7 @@ extension PictureSearchViewController {
 
         let english = colorOption.englishColor
         resetPage()
-        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        scrollCollectionView()
         NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, sort: currentSortType.rawValue, color: english) { [weak self] result in
             switch result {
             case .success(let value):
@@ -252,7 +252,7 @@ extension PictureSearchViewController {
         currentSortType = sender.isOn ? .latest : .relevant
         performSearch()
         resetPage()
-        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        scrollCollectionView()
     }
 }
 
@@ -314,5 +314,14 @@ extension PictureSearchViewController {
             }
             self?.isFetching = false
         }
+    }
+
+    private func scrollCollectionView() {
+        print(#function)
+        let hasItems = collectionView.numberOfSections > 0 && collectionView.numberOfItems(inSection: 0) > 0
+
+        guard hasItems else { return }
+
+        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
     }
 }
