@@ -11,12 +11,11 @@ import Alamofire
 final class NetworkManager {
     static let shared = NetworkManager()
     private init() { }
-    
-    static let display = 20
-    
+    private let display = 20
+
     // 정보 불러오기
     func fetchItem(query: String, page: Int, sort: String = "relevant", completion: @escaping (Result<PictureSearch, Error>) -> Void) {
-        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(sort)&client_id=\(APIKey.unsplash.rawValue)"
+        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&per_page=\(display)&order_by=\(sort)&client_id=\(APIKey.unsplash.rawValue)"
         print(#function, url)
         
         AF.request(url, method: .get)
@@ -26,8 +25,8 @@ final class NetworkManager {
     }
     
     // 색상을 기준으로 정보 불러오기
-    func fetchColorItem(query: String, page: Int, orderBy: String = "relevant", color: String, completion: @escaping (Result<PictureSearch, Error>) -> Void) {
-        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(orderBy)&color=\(color)&client_id=\(APIKey.unsplash.rawValue)"
+    func fetchColorItem(query: String, page: Int, sort: String = "relevant", color: String, completion: @escaping (Result<PictureSearch, Error>) -> Void) {
+        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(sort)&color=\(color)&client_id=\(APIKey.unsplash.rawValue)"
         print(#function, url)
         AF.request(url, method: .get)
             .responseDecodable(of: PictureSearch.self) { response in

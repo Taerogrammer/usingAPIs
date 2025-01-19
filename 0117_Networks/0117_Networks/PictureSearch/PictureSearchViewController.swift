@@ -24,13 +24,18 @@ final class PictureSearchViewController: UIViewController {
     private var pictureSearch: PictureSearch?
     var items: [PictureResult]? {
         didSet {
+            guard let items = items, !items.isEmpty else {
+                updateNoDataInfoLabelVisibility()
+                return
+            }
             self.collectionView.reloadData()
             updateNoDataInfoLabelVisibility()
         }
     }
     private var page = 1
-
     private let noDataInfoLabel = UILabel()
+    private var isFetching = false
+    private var totalPages: Int = 1 // 초기값을 1로 설정
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,7 +150,8 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PictureSearchCollectionViewCell.id, for: indexPath) as! PictureSearchCollectionViewCell
 
-        if let picture = pictureSearch?.results[indexPath.item] {
+        if let items = items, indexPath.item < items.count {
+            let picture = items[indexPath.item]
             cell.configureItem(with: picture)
         }
 
@@ -170,8 +176,14 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
 // MARK: Collection View Prefetching
 extension PictureSearchViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        for item in indexPaths {
-            print(#function, item.row)
+        guard let items = items, !isFetching else { return }
+        for indexPath in indexPaths {
+            if indexPath.item >= items.count - 3 {
+                if page < totalPages {
+                    loadMoreData()
+                }
+                break
+            }
         }
     }
 }
@@ -198,6 +210,7 @@ extension PictureSearchViewController: UISearchBarDelegate {
             switch result {
             case .success(let value):
                 self?.pictureSearch = value
+                self?.totalPages = value.totalPages
                 self?.items = self?.pictureSearch?.results ?? []
             case .failure(let error):
                 print("error ", error)
@@ -222,7 +235,8 @@ extension PictureSearchViewController {
 
         let english = colorOption.englishColor
         resetPage()
-        NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, color: english) { [weak self] result in
+        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, sort: currentSortType.rawValue, color: english) { [weak self] result in
             switch result {
             case .success(let value):
 //                print("success -> ", value)
@@ -237,6 +251,8 @@ extension PictureSearchViewController {
     @objc private func sortSwitchToggled(_ sender: UISwitch) {
         currentSortType = sender.isOn ? .latest : .relevant
         performSearch()
+        resetPage()
+        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
     }
 }
 
@@ -250,13 +266,17 @@ extension PictureSearchViewController {
     }
 
     // 페이지 리셋
-    private func resetPage() { self.page = 1 }
+    private func resetPage() {
+        self.page = 1
+    }
 
     private func updateNoDataInfoLabelVisibility() {
         if let items = items, !items.isEmpty {
             noDataInfoLabel.isHidden = true
+            collectionView.isHidden = false
         } else {
             noDataInfoLabel.text = (searchBar.text?.isEmpty ?? true) ? "사진을 검색해보세요" : "검색 결과가 없습니다"
+            collectionView.isHidden = true
             noDataInfoLabel.isHidden = false
         }
     }
@@ -275,5 +295,24 @@ extension PictureSearchViewController {
             }
         }
         print(#function, currentSortType.rawValue)
+    }
+
+    private func loadMoreData() {
+        print(#function)
+        guard let query = searchBar.text, !query.isEmpty else { return }
+
+        isFetching = true
+        self.page += 1
+
+        NetworkManager.shared.fetchItem(query: query, page: self.page, sort: currentSortType.rawValue) { [weak self] result in
+            self?.isFetching = false
+            switch result {
+            case .success(let value):
+                self?.items?.append(contentsOf: value.results)
+            case .failure(let error):
+                print("페이지네이션 에러 ->", error)
+            }
+            self?.isFetching = false
+        }
     }
 }
