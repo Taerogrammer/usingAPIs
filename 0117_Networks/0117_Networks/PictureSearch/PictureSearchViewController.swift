@@ -22,9 +22,12 @@ final class PictureSearchViewController: UIViewController {
     var items: [PictureResult]? {
         didSet {
             self.collectionView.reloadData()
+            updateNoDataInfoLabelVisibility()
         }
     }
     private var page = 1
+
+    private let noDataInfoLabel = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,7 +38,7 @@ final class PictureSearchViewController: UIViewController {
 // MARK: UI
 extension PictureSearchViewController: ViewConfiguration {
     func configureHierarchy() {
-        [searchBar, scrollView, collectionView].forEach { view.addSubview($0) }
+        [searchBar, scrollView, collectionView, noDataInfoLabel].forEach { view.addSubview($0) }
         scrollView.addSubview(stackView)
     }
     
@@ -57,6 +60,9 @@ extension PictureSearchViewController: ViewConfiguration {
             make.top.equalTo(scrollView.snp.bottom)
             make.bottom.horizontalEdges.equalToSuperview()
         }
+        noDataInfoLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
     }
     
     func configureView() {
@@ -69,6 +75,11 @@ extension PictureSearchViewController: ViewConfiguration {
         stackView.alignment = .center
         stackView.layoutMargins = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
         stackView.isLayoutMarginsRelativeArrangement = true
+
+        noDataInfoLabel.text = "사진을 검색해보세요"
+        noDataInfoLabel.font = .boldSystemFont(ofSize: 24)
+        noDataInfoLabel.textAlignment = .center
+        noDataInfoLabel.isHidden = false
     }
     private func ScrollButton(title: String, tintColor: UIColor) -> UIButton {
         let button = UIButton()
@@ -225,4 +236,13 @@ extension PictureSearchViewController {
 
     // 페이지 리셋
     private func resetPage() { self.page = 1 }
+
+    private func updateNoDataInfoLabelVisibility() {
+        if let items = items, !items.isEmpty {
+            noDataInfoLabel.isHidden = true
+        } else {
+            noDataInfoLabel.text = (searchBar.text?.isEmpty ?? true) ? "사진을 검색해보세요" : "검색 결과가 없습니다"
+            noDataInfoLabel.isHidden = false
+        }
+    }
 }
