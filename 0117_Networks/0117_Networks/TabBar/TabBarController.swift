@@ -19,9 +19,10 @@ final class TabBarController: UITabBarController {
 // MARK: configure
 extension TabBarController {
     private func configureTabBar() {
-        let topicVC = TopicViewController()
         let pictureSearchVC = PictureSearchViewController()
         let pictureSearchNav = UINavigationController(rootViewController: pictureSearchVC)
+        let topicVC = TopicViewController()
+        let topicNav = UINavigationController(rootViewController: topicVC)
 
         topicVC.tabBarItem.title = "토픽"
         topicVC.tabBarItem.image = UIImage(systemName: "list.clipboard")
@@ -31,7 +32,7 @@ extension TabBarController {
         pictureSearchNav.tabBarItem.image = UIImage(systemName: "photo")
         pictureSearchNav.tabBarItem.selectedImage = UIImage(systemName: "photo.fill")
 
-        setViewControllers([topicVC, pictureSearchNav], animated: true)
+        setViewControllers([pictureSearchNav, topicNav], animated: true)
     }
     private func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
