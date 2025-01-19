@@ -36,3 +36,8 @@ enum SplashAPI: String {
     case search = "https://api.unsplash.com/search/photos?"
     case detail = "https://api.unsplash.com/photos/"
 }
+
+enum SortType: String {
+    case relevant = "relevant" // 관련순 (기본값)
+    case latest = "latest"     // 최신순
+}

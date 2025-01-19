@@ -15,8 +15,8 @@ final class NetworkManager {
     static let display = 20
     
     // 정보 불러오기
-    func fetchItem(query: String, page: Int, orderBy: String = "relevant", completion: @escaping (Result<PictureSearch, Error>) -> Void) {
-        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(orderBy)&client_id=\(APIKey.unsplash.rawValue)"
+    func fetchItem(query: String, page: Int, sort: String = "relevant", completion: @escaping (Result<PictureSearch, Error>) -> Void) {
+        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(sort)&client_id=\(APIKey.unsplash.rawValue)"
         print(#function, url)
         
         AF.request(url, method: .get)

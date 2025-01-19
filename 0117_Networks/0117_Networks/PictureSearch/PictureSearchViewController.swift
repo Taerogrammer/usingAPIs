@@ -15,6 +15,9 @@ final class PictureSearchViewController: UIViewController {
     private let searchBar = UISearchBar()
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
+    private let sortSwitch = UISwitch()
+    private var currentSortType: SortType = .relevant
+
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createItemCollectionViewLayout())
     private var selectedButton: UIButton?
 
@@ -38,7 +41,7 @@ final class PictureSearchViewController: UIViewController {
 // MARK: UI
 extension PictureSearchViewController: ViewConfiguration {
     func configureHierarchy() {
-        [searchBar, scrollView, collectionView, noDataInfoLabel].forEach { view.addSubview($0) }
+        [searchBar, sortSwitch, scrollView, collectionView, noDataInfoLabel].forEach { view.addSubview($0) }
         scrollView.addSubview(stackView)
     }
     
@@ -47,8 +50,13 @@ extension PictureSearchViewController: ViewConfiguration {
             make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(44)
         }
+        sortSwitch.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom).offset(8)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.height.equalTo(30)
+        }
         scrollView.snp.makeConstraints { make in
-            make.top.equalTo(searchBar.snp.bottom)
+            make.top.equalTo(sortSwitch.snp.bottom)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(50)
         }
@@ -80,6 +88,8 @@ extension PictureSearchViewController: ViewConfiguration {
         noDataInfoLabel.font = .boldSystemFont(ofSize: 24)
         noDataInfoLabel.textAlignment = .center
         noDataInfoLabel.isHidden = false
+        sortSwitch.isOn = false
+        sortSwitch.addTarget(self, action: #selector(sortSwitchToggled(_:)), for: .valueChanged)
     }
     private func ScrollButton(title: String, tintColor: UIColor) -> UIButton {
         let button = UIButton()
@@ -223,6 +233,11 @@ extension PictureSearchViewController {
             }
         }
     }
+
+    @objc private func sortSwitchToggled(_ sender: UISwitch) {
+        currentSortType = sender.isOn ? .latest : .relevant
+        performSearch()
+    }
 }
 
 // MARK: Method
@@ -244,5 +259,21 @@ extension PictureSearchViewController {
             noDataInfoLabel.text = (searchBar.text?.isEmpty ?? true) ? "사진을 검색해보세요" : "검색 결과가 없습니다"
             noDataInfoLabel.isHidden = false
         }
+    }
+
+    private func performSearch() {
+        guard let query = searchBar.text, !query.isEmpty else { return }
+        resetPage()
+
+        NetworkManager.shared.fetchItem(query: query, page: self.page, sort: currentSortType.rawValue) { [weak self] result in
+            switch result {
+            case .success(let value):
+                self?.pictureSearch = value
+                self?.items = self?.pictureSearch?.results ?? []
+            case .failure(let error):
+                print("error -> ", error)
+            }
+        }
+        print(#function, currentSortType.rawValue)
     }
 }
