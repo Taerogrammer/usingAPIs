@@ -48,6 +48,8 @@ extension TopicViewController: ViewConfiguration {
         }
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+
+            // TODO: - 동적으로 높이 조절
             make.height.equalTo(900)
         }
 
@@ -56,10 +58,8 @@ extension TopicViewController: ViewConfiguration {
     func configureView() {
         navigationItem.title = "TOPIC"
         scrollView.showsVerticalScrollIndicator = false
-        collectionView.backgroundColor = .green
     }
 
-    
     private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout(section: createSectionLayout())
     }
@@ -78,8 +78,11 @@ extension TopicViewController: ViewConfiguration {
 
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(50))
         let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
-        section.boundarySupplementaryItems = [header]
 
+        let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(20))
+        let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: footerSize, elementKind: UICollectionView.elementKindSectionFooter, alignment: .bottom)
+
+        section.boundarySupplementaryItems = [header, footer]
         return section
     }
 
@@ -93,6 +96,7 @@ extension TopicViewController: DelegateConfiguration {
         collectionView.dataSource = self
         collectionView.register(TopicCollectionViewCell.self, forCellWithReuseIdentifier: TopicCollectionViewCell.id)
         collectionView.register(TopicHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TopicHeaderView.id)
+        collectionView.register(TopicFooterView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: TopicFooterView.id)
     }
 }
 
@@ -108,14 +112,24 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TopicCollectionViewCell.id, for: indexPath) as! TopicCollectionViewCell
+        let topicDetail = topicImages[indexPath.section][indexPath.item]
+        cell.configureItem(with: topicDetail)
 
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TopicHeaderView.id, for: indexPath) as! TopicHeaderView
-        header.configureHeaderTitle(title: topics[indexPath.section])
-        return header
+
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TopicHeaderView.id, for: indexPath) as! TopicHeaderView
+            header.configureHeaderTitle(title: topics[indexPath.section])
+
+            return header
+        } else {
+            let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TopicFooterView.id, for: indexPath) as! TopicFooterView
+
+            return footer
+        }
     }
 }
 

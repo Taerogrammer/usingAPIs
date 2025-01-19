@@ -7,11 +7,12 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class TopicCollectionViewCell: UICollectionViewCell {
     static let id = "TopicCollectionViewCell"
 
-    private let imageView = UIImageView()
+    let imageView = UIImageView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,6 +40,12 @@ extension TopicCollectionViewCell: ViewConfiguration {
     func configureView() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .blue
+        imageView.backgroundColor = .systemGray2
+        imageView.layer.cornerRadius = 8
+    }
+
+    func configureItem(with item: Topic) {
+        let url = URL(string: item.urls.raw)
+        imageView.kf.setImage(with: url)
     }
 }
