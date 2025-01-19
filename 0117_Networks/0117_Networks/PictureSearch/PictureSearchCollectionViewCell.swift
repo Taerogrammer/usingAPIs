@@ -65,6 +65,6 @@ extension PictureSearchCollectionViewCell: ViewConfiguration {
     func configureItem(with row: PictureResult) {
         let url = URL(string: row.urls.raw)
         imgView.kf.setImage(with: url)
-        starButton.setTitle("\(row.likes)", for: .normal)
+        starButton.setTitle(row.likes.formatted(), for: .normal)
     }
 }

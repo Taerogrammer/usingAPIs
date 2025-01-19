@@ -6,13 +6,14 @@
 //
 
 import UIKit
-import SnapKit
 import Kingfisher
+import SnapKit
 
 final class TopicCollectionViewCell: UICollectionViewCell {
     static let id = "TopicCollectionViewCell"
 
     let imageView = UIImageView()
+    let starButton = UIButton()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,12 +29,15 @@ final class TopicCollectionViewCell: UICollectionViewCell {
 // MARK: UI
 extension TopicCollectionViewCell: ViewConfiguration {
     func configureHierarchy() {
-        contentView.addSubview(imageView)
+        [imageView, starButton].forEach { contentView.addSubview($0) }
     }
     
     func configureLayout() {
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        starButton.snp.makeConstraints { make in
+            make.leading.bottom.equalTo(imageView).inset(12)
         }
     }
     
@@ -42,10 +46,21 @@ extension TopicCollectionViewCell: ViewConfiguration {
         imageView.clipsToBounds = true
         imageView.backgroundColor = .systemGray2
         imageView.layer.cornerRadius = 8
+
+        starButton.setTitle("", for: .normal)
+        starButton.titleLabel?.font = .systemFont(ofSize: 12)
+        starButton.setImage(UIImage(systemName: "star.fill"), for: .disabled)
+        starButton.tintColor = .yellow
+        starButton.clipsToBounds = true
+        starButton.layer.cornerRadius = 14
+        starButton.backgroundColor = .gray
+        starButton.contentEdgeInsets = .init(top: 4, left: 8, bottom: 4, right: 8)
+        starButton.isEnabled = false
     }
 
     func configureItem(with item: Topic) {
         let url = URL(string: item.urls.raw)
         imageView.kf.setImage(with: url)
+        starButton.setTitle(item.likes.formatted(), for: .normal)
     }
 }
