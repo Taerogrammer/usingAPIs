@@ -15,15 +15,18 @@ final class TopicViewController: UIViewController {
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
     private let topics: [String] = ["골든 아워", "비즈니스 및 업무", "건축 및 인테리어"]
 
-    private let topicImages: [[TopicDetail]] = [
-        dummyTopics.topicDetail.shuffled(),
-        dummyTopics.topicDetail.shuffled(),
-        dummyTopics.topicDetail.shuffled()
+    // 딕셔너리를 이용한 변환
+    private let topicEnglish: [String: String] = [
+        "골든 아워": "golden-hour",
+        "비즈니스 및 업무": "business-work",
+        "건축 및 인테리어": "architecture-interior"
     ]
+
+    private var topicImages: [[Topic]] = Array(repeating: [], count: 3)
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        [configureHierarchy(), configureLayout(), configureView(), configureDelegate()].forEach { $0 }
+        [configureHierarchy(), configureLayout(), configureView(), configureDelegate(), fetchTopics()].forEach { $0 }
     }
 }
 
@@ -113,5 +116,35 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TopicHeaderView.id, for: indexPath) as! TopicHeaderView
         header.configureHeaderTitle(title: topics[indexPath.section])
         return header
+    }
+}
+
+
+// MARK: Methods
+extension TopicViewController {
+    private func fetchTopics() {
+        // DispatchGroup으로 묶어 Task 그룹화
+        let dispatchGroup = DispatchGroup()
+        for (index, topic) in topics.enumerated() {
+            guard let convertedTopic = topicEnglish[topic] else { return }
+            // 그룹화 Task 시작
+            dispatchGroup.enter()
+            NetworkManager.shared.fetchTopic(topic: convertedTopic) { [weak self] result in
+                // 끝나는 시점을 정확히 모르는 경우
+                // defer: 해당 블럭의 마지막에 실행
+                defer { dispatchGroup.leave() }
+
+                switch result {
+                case .success(let value):
+                    self?.topicImages[index] = value
+                case .failure(let error):
+                    print("error -> ", error)
+                }
+            }
+        }
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            print("데이터 로드 완료")
+            self?.collectionView.reloadData()
+        }
     }
 }
