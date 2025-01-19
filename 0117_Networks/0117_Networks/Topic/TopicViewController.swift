@@ -118,6 +118,21 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
         return cell
     }
 
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let detailVC = PictureDetailViewController()
+
+        NetworkManager.shared.fetchPhotoDetail(photoId: topicImages[indexPath.section][indexPath.item].id) { result in
+            switch result {
+            case .success(let value):
+                detailVC.configureImage(with: self.topicImages[indexPath.section][indexPath.item].urls.small)
+                detailVC.configureDetail(with: value)
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            case .failure(let error):
+                print("에러 -> ", error)
+            }
+        }
+    }
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
 
         if kind == UICollectionView.elementKindSectionHeader {

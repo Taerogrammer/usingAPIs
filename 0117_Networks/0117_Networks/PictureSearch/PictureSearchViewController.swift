@@ -144,11 +144,11 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let selectedPicture = items?[indexPath.item] else { return }
         let detailVC = PictureDetailViewController()
-
         NetworkManager.shared.fetchPhotoDetail(photoId: selectedPicture.id) { result in
             switch result {
             case .success(let value):
-                detailVC.configureItem(with: selectedPicture, detail: value)
+                detailVC.configureDetail(with: value)
+                detailVC.configureImage(with: selectedPicture.urls.small)
                 self.navigationController?.pushViewController(detailVC, animated: true)
             case .failure(let error):
                 print("error -> ", error)

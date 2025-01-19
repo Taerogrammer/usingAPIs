@@ -84,10 +84,13 @@ extension PictureDetailViewController: ViewConfiguration {
         downloadsText.font = .systemFont(ofSize: 14)
     }
 
-    func configureItem(with item: PictureResult, detail: PhotoDetail) {
-        let imageURL = URL(string: item.urls.small)
-        imageView.kf.setImage(with: imageURL)
+    func configureDetail(with detail: PhotoDetail) {
         downloadsText.text = "\(detail.downloads.total.formatted())"
         viewsText.text = "\(detail.views.total.formatted())"
+    }
+
+    func configureImage(with photoId: String) {
+        let url = URL(string: photoId)
+        imageView.kf.setImage(with: url)
     }
 }

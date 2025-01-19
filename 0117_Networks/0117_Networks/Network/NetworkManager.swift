@@ -53,7 +53,5 @@ final class NetworkManager {
             .responseDecodable(of: [Topic].self) { response in
                 completion(response.result.mapError { $0 as Error })
             }
-        
     }
-    
 }
