@@ -10,6 +10,7 @@ import SwiftUI
 import Kingfisher
 import SnapKit
 
+// TODO: - 차트 구현하기
 final class PictureDetailViewController: UIViewController {
 
     private let scrollView = UIScrollView()
