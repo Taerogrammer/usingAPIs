@@ -13,13 +13,32 @@ final class TopicViewController: UIViewController {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
-    private let topics: [String] = ["골든 아워", "비즈니스 및 업무", "건축 및 인테리어"]
+    private var topics: [String] = ["골든 아워", "비즈니스 및 업무", "건축 및 인테리어"] {
+        didSet {
+            if topics.count == 3 { fetchTopics() }
+        }
+    }
+
+    private let topicsTest: [String] = ["건축 및 인테리어", "골든 아워", "배경 화면", "자연", "3D 렌더링", "여행하다", "텍스쳐 및 패턴", "거리 사진", "필름", "기록의", "실험적인", "동물", "패션 및 뷰티", "사람", "비즈니스 및 업무", "식음료"]
 
     // 딕셔너리를 이용한 변환
     private let topicEnglish: [String: String] = [
+        "건축 및 인테리어": "architecture-interior",
         "골든 아워": "golden-hour",
+        "배경 화면": "wallpapers",
+        "자연": "nature",
+        "3D 렌더링": "3d-renders",
+        "여행하다": "travel",
+        "텍스쳐 및 패턴": "textures-patterns",
+        "거리 사진": "street-photography",
+        "필름": "film",
+        "기록의": "archival",
+        "실험적인": "experimental",
+        "동물": "animals",
+        "패션 및 뷰티": "fashion-beauty",
+        "사람": "people",
         "비즈니스 및 업무": "business-work",
-        "건축 및 인테리어": "architecture-interior"
+        "식음료": "food-drink"
     ]
 
     private var topicImages: [[Topic]] = Array(repeating: [], count: 3)
@@ -178,6 +197,17 @@ extension TopicViewController {
             self?.collectionView.reloadData()
         }
     }
+
+    private func getThreeRandomTopic() {
+        var categories = Array(0...15)
+        self.topics.removeAll()
+        for _ in 0..<3 {
+            let index = categories.randomElement()!
+            topics.append(topicsTest[index])
+            let idx = categories.firstIndex(of: index)!
+            categories.remove(at: idx)
+        }
+    }
 }
 
 // MARK: @objc
@@ -187,5 +217,6 @@ extension TopicViewController {
         DispatchQueue.main.async {
             self.collectionView.refreshControl?.endRefreshing()
         }
+        getThreeRandomTopic()
     }
 }
