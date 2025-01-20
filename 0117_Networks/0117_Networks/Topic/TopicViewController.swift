@@ -43,6 +43,9 @@ final class TopicViewController: UIViewController {
 
     private var topicImages: [[Topic]] = Array(repeating: [], count: 3)
 
+    private var timer = Timer.self
+    private var oneMinutePassed = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(), configureLayout(), configureView(), configureDelegate(), fetchTopics(), configureRefreshControl()].forEach { $0 }
@@ -196,6 +199,10 @@ extension TopicViewController {
             print("데이터 로드 완료")
             self?.collectionView.reloadData()
         }
+        // 1분
+        DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+            self.oneMinutePassed = true
+        }
     }
 
     private func getThreeRandomTopic() {
@@ -217,6 +224,9 @@ extension TopicViewController {
         DispatchQueue.main.async {
             self.collectionView.refreshControl?.endRefreshing()
         }
-        getThreeRandomTopic()
+        if oneMinutePassed {
+            getThreeRandomTopic()
+            self.oneMinutePassed = false
+        }
     }
 }
