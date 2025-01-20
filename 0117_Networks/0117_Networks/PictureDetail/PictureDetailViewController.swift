@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 import Kingfisher
 import SnapKit
 
@@ -20,10 +21,12 @@ final class PictureDetailViewController: UIViewController {
     private let downloadsText = UILabel()
     private let viewsLabel = UILabel()
     private let viewsText = UILabel()
+    private let chartLabel = UILabel()
+    private let segmentedControl = UISegmentedControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        [configureHierarchy(), configureLayout(), configureView()].forEach { $0 }
+        [configureHierarchy(), configureLayout(), configureView(), configureChartView()].forEach { $0 }
     }
 }
 
@@ -32,7 +35,7 @@ extension PictureDetailViewController: ViewConfiguration {
     func configureHierarchy() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        [imageView, infoLabel, downloadsLabel, downloadsText, viewsLabel, viewsText].forEach { contentView.addSubview($0) }
+        [imageView, infoLabel, downloadsLabel, downloadsText, viewsLabel, viewsText, chartLabel, segmentedControl].forEach { contentView.addSubview($0) }
     }
     
     func configureLayout() {
@@ -62,17 +65,24 @@ extension PictureDetailViewController: ViewConfiguration {
         downloadsLabel.snp.makeConstraints { make in
             make.leading.equalTo(viewsLabel)
             make.top.equalTo(viewsLabel.snp.bottom).offset(24)
-            make.bottom.equalTo(contentView).inset(20)
+//            make.bottom.equalTo(contentView).inset(20)
         }
         downloadsText.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(24)
             make.centerY.equalTo(downloadsLabel)
         }
+        chartLabel.snp.makeConstraints { make in
+            make.leading.equalTo(infoLabel)
+            make.top.equalTo(downloadsLabel.snp.bottom).offset(32)
+        }
+        segmentedControl.snp.makeConstraints { make in
+            make.centerY.equalTo(chartLabel)
+            make.leading.equalTo(chartLabel.snp.trailing).offset(24)
+        }
     }
     
     func configureView() {
-//        scrollView.backgroundColor = .blue
-//        contentView.backgroundColor = .red
+
         imageView.contentMode = .scaleAspectFill
         infoLabel.text = "정보"
         infoLabel.font = .boldSystemFont(ofSize: 24)
@@ -82,6 +92,13 @@ extension PictureDetailViewController: ViewConfiguration {
         downloadsLabel.text = "다운로드"
         downloadsLabel.font = .boldSystemFont(ofSize: 14)
         downloadsText.font = .systemFont(ofSize: 14)
+        chartLabel.text = "차트"
+        chartLabel.font = .boldSystemFont(ofSize: 24)
+
+        segmentedControl.insertSegment(withTitle: "조회", at: 0, animated: true)
+        segmentedControl.insertSegment(withTitle: "다운로드", at: 1, animated: true)
+        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.addTarget(self, action: #selector(segmentedTapped), for: .valueChanged)
     }
 
     func configureDetail(with detail: PhotoDetail) {
@@ -92,5 +109,29 @@ extension PictureDetailViewController: ViewConfiguration {
     func configureImage(with photoId: String) {
         let url = URL(string: photoId)
         imageView.kf.setImage(with: url)
+    }
+}
+
+// MARK: Chart
+extension PictureDetailViewController {
+    private func configureChartView() {
+        let controller = UIHostingController(rootView: ChartView())
+        guard let chartView = controller.view else { return }
+        contentView.addSubview(chartView)
+
+        chartView.snp.makeConstraints { make in
+            make.top.equalTo(chartLabel.snp.bottom).offset(24)
+            make.width.equalTo(contentView)
+            make.bottom.equalTo(contentView).inset(60)
+            make.height.equalTo(500)
+        }
+    }
+}
+
+// MARK: @objc
+extension PictureDetailViewController {
+    @objc func segmentedTapped(segment: UISegmentedControl) {
+        print(#function, segment.selectedSegmentIndex)
+
     }
 }
