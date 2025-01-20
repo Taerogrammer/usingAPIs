@@ -26,7 +26,7 @@ final class TopicViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        [configureHierarchy(), configureLayout(), configureView(), configureDelegate(), fetchTopics()].forEach { $0 }
+        [configureHierarchy(), configureLayout(), configureView(), configureDelegate(), fetchTopics(), configureRefreshControl()].forEach { $0 }
     }
 }
 
@@ -48,16 +48,18 @@ extension TopicViewController: ViewConfiguration {
         }
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-
-            // TODO: - 동적으로 높이 조절
-            make.height.equalTo(900)
+            make.height.equalTo(scrollView.snp.height)
         }
-
     }
     
     func configureView() {
         navigationItem.title = "TOPIC"
         scrollView.showsVerticalScrollIndicator = false
+    }
+
+    private func configureRefreshControl() {
+        collectionView.refreshControl = UIRefreshControl()
+        collectionView.refreshControl?.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
     }
 
     private func createCompositionalLayout() -> UICollectionViewCompositionalLayout {
@@ -174,6 +176,16 @@ extension TopicViewController {
         dispatchGroup.notify(queue: .main) { [weak self] in
             print("데이터 로드 완료")
             self?.collectionView.reloadData()
+        }
+    }
+}
+
+// MARK: @objc
+extension TopicViewController {
+    @objc private func handleRefreshControl() {
+        print(#function)
+        DispatchQueue.main.async {
+            self.collectionView.refreshControl?.endRefreshing()
         }
     }
 }
