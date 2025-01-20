@@ -59,8 +59,38 @@ extension TopicCollectionViewCell: ViewConfiguration {
     }
 
     func configureItem(with item: Topic) {
-        let url = URL(string: item.urls.raw)
-        imageView.kf.setImage(with: url)
+        guard let url = URL(string: item.urls.small) else { return }
+        let imageSize: CGSize = imageView.frame.size
+
+        // 비동기 네트워크 요청
+        DispatchQueue.global(qos: .userInitiated).async {
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                guard let data = data, error == nil else { return }
+
+                let renderImage = self.downsampleImage(at: data, to: imageSize, scale: UIScreen.main.scale)
+
+                DispatchQueue.main.async {
+                    self.imageView.image = renderImage
+                }
+            }.resume()
+        }
+
         starButton.setTitle(item.likes.formatted(), for: .normal)
+    }
+
+    private func downsampleImage(at imageData: Data, to pointSize: CGSize, scale: CGFloat) -> UIImage {
+        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        let imageSource = CGImageSourceCreateWithData(imageData as CFData, imageSourceOptions)!
+
+        let maxDimensionInPixels = max(pointSize.width, pointSize.height) * scale
+        let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
+        ] as CFDictionary
+
+        let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions)!
+        return UIImage(cgImage: downsampledImage)
     }
 }

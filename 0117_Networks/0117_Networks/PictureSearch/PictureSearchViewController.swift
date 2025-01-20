@@ -239,7 +239,6 @@ extension PictureSearchViewController {
         NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, sort: currentSortType.rawValue, color: english) { [weak self] result in
             switch result {
             case .success(let value):
-//                print("success -> ", value)
                 self?.pictureSearch = value
                 self?.items = self?.pictureSearch?.results ?? []
             case .failure(let error):

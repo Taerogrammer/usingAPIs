@@ -63,8 +63,35 @@ extension PictureSearchCollectionViewCell: ViewConfiguration {
         likeImageView.tintColor = .white
     }
     func configureItem(with row: PictureResult) {
-        let url = URL(string: row.urls.raw)
-        imgView.kf.setImage(with: url)
+        guard let url = URL(string: row.urls.raw) else { return }
+        let imageSize: CGSize = imgView.frame.size
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                guard let data = data, error == nil else { return }
+                let renderImage = self.downsampleImage(at: data, to: imageSize, scale: UIScreen.main.scale)
+
+                DispatchQueue.main.async {
+                    self.imgView.image = renderImage
+                }
+            }.resume()
+        }
         starButton.setTitle(row.likes.formatted(), for: .normal)
+    }
+
+    private func downsampleImage(at imageData: Data, to pointSize: CGSize, scale: CGFloat) -> UIImage {
+        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        let imageSource = CGImageSourceCreateWithData(imageData as CFData, imageSourceOptions)!
+
+        let maxDimensionInPixels = max(pointSize.width, pointSize.height) * scale
+        let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
+        ] as CFDictionary
+
+        let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions)!
+        return UIImage(cgImage: downsampledImage)
     }
 }
