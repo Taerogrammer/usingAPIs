@@ -10,7 +10,6 @@ import SwiftUI
 import Kingfisher
 import SnapKit
 
-// TODO: - 차트 구현하기
 final class PictureDetailViewController: UIViewController {
 
     private let scrollView = UIScrollView()
@@ -24,16 +23,11 @@ final class PictureDetailViewController: UIViewController {
     private let viewsText = UILabel()
     private let chartLabel = UILabel()
     private let segmentedControl = UISegmentedControl()
-
     private var chartHostingController: UIHostingController<ChartView>?
 
-    var historyData: [HistoryValue] = [] {
-        didSet {
-            updateChartView()
-        }
-    }
-
-    private var photoDetail: PhotoDetail?
+    var viewData: [HistoryValue] = []
+    var downloadData: [HistoryValue] = []
+    var historyData: [HistoryValue] = []    // ChartView에 전달될 데이터
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,7 +109,10 @@ extension PictureDetailViewController: ViewConfiguration {
     func configureDetail(with detail: PhotoDetail) {
         downloadsText.text = "\(detail.downloads.total.formatted())"
         viewsText.text = "\(detail.views.total.formatted())"
-        historyData = detail.views.historical.values
+
+        downloadData = detail.downloads.historical.values
+        viewData = detail.views.historical.values
+        historyData = viewData
     }
 
     func configureImage(with photoId: String) {
@@ -127,7 +124,7 @@ extension PictureDetailViewController: ViewConfiguration {
 // MARK: Chart
 extension PictureDetailViewController {
     private func configureChartView() {
-        let chartView = ChartView(data: historyData)
+        let chartView = ChartView(data: viewData)
         let controller = UIHostingController(rootView: chartView)
         self.chartHostingController = controller
 
@@ -138,7 +135,7 @@ extension PictureDetailViewController {
             make.top.equalTo(chartLabel.snp.bottom).offset(24)
             make.width.equalTo(contentView)
             make.bottom.equalTo(contentView).inset(60)
-            make.height.equalTo(500)
+            make.height.equalTo(400)
         }
     }
     private func updateChartView() {
@@ -149,9 +146,9 @@ extension PictureDetailViewController {
 
 // MARK: @objc
 extension PictureDetailViewController {
-    @objc func segmentedTapped(segment: UISegmentedControl) {
-        guard let detail = photoDetail else { return }
+    @objc func segmentedTapped(_ segment: UISegmentedControl) {
         let isViews = segment.selectedSegmentIndex == 0
-        historyData = isViews ? detail.views.historical.values : detail.downloads.historical.values
+        historyData = isViews ? viewData : downloadData
+        updateChartView()
     }
 }
