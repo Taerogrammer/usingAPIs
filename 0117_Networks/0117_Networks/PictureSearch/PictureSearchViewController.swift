@@ -240,13 +240,14 @@ extension PictureSearchViewController {
         let english = colorOption.englishColor
         resetPage()
         scrollCollectionView()
-        NetworkManager.shared.fetchColorItem(query: searchBar.text!, page: self.page, sort: currentSortType.rawValue, color: english) { [weak self] result in
+        unsplashData = .init(query: searchBar.text!, page: self.page, per_page: 20, color: english)
+        NetworkManager.shared.fetchItem(api: unsplashData.toRequest()) { result in
             switch result {
-            case .success(let value):
-                self?.pictureSearch = value
-                self?.items = self?.pictureSearch?.results ?? []
-            case .failure(let error):
-                print("error ", error)
+            case .success(let success):
+                self.pictureSearch = success
+                self.items = self.pictureSearch?.results ?? []
+            case .failure(let failure):
+                print("error -> ", failure)
             }
         }
     }
