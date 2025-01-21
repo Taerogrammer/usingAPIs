@@ -32,3 +32,11 @@ struct UnsplashTopic {
         return .topic(topicID: topicID, page: page)
     }
 }
+
+struct UnsplashStatistics {
+    var imageId: String
+
+    func toRequest() -> UnsplashRequest {
+        return .statistics(imageId: imageId)
+    }
+}

@@ -19,6 +19,7 @@ final class PictureSearchViewController: UIViewController {
     private var currentSortType: SortType = .relevant
 
     private var unsplashData = UnsplashSearch(query: "", page: 1, per_page: 20)
+    private var unsplashStatistics = UnsplashStatistics(imageId: "")
 
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createItemCollectionViewLayout())
     private var selectedButton: UIButton?
@@ -161,17 +162,19 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let selectedPicture = items?[indexPath.item] else { return }
+        unsplashStatistics.imageId = selectedPicture.id
         let detailVC = PictureDetailViewController()
-        NetworkManager.shared.fetchPhotoDetail(photoId: selectedPicture.id) { result in
+        NetworkManager.shared.fetchStatistic(api: unsplashStatistics.toRequest()) { result in
             switch result {
-            case .success(let value):
-                detailVC.configureDetail(with: value)
+            case .success(let success):
+                detailVC.configureDetail(with: success)
                 detailVC.configureImage(with: selectedPicture.urls.small)
                 self.navigationController?.pushViewController(detailVC, animated: true)
-            case .failure(let error):
-                print("error -> ", error)
+            case .failure(let failure):
+                print("error -> ", failure)
             }
         }
+
     }
 }
 

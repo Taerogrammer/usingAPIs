@@ -12,7 +12,7 @@ final class NetworkManager {
     static let shared = NetworkManager()
     private init() { }
 
-    // 정보 불러오기 test
+    // search
     func fetchItem(api: UnsplashRequest, completionHandler: @escaping (Result<PictureSearch, Error>) -> Void) {
         AF.request(
             api.endPoint,
@@ -25,17 +25,20 @@ final class NetworkManager {
         }
     }
 
-    // detail
-    func fetchPhotoDetail(photoId: String, completion: @escaping (Result<PhotoDetail, Error>) -> Void) {
-        let url = "https://api.unsplash.com/photos/\(photoId)/statistics?client_id=\(APIKey.unsplash.rawValue)"
-        print(#function, url)
-        
-        AF.request(url, method: .get)
-            .responseDecodable(of: PhotoDetail.self) { response in
-                completion(response.result.mapError { $0 as Error })
-            }
+    // statistics
+    func fetchStatistic(api: UnsplashRequest, completionHandler: @escaping (Result<PhotoDetail, Error>) -> Void) {
+        AF.request(
+            api.endPoint,
+            method: api.method,
+            parameters: api.parameter,
+            encoding: URLEncoding(destination: .queryString))
+        .validate(statusCode: 200..<500)
+        .responseDecodable(of: PhotoDetail.self) { response in
+            completionHandler(response.result.mapError { $0 as Error })
+        }
     }
 
+    // topic
     func fetchTopic(api: UnsplashRequest, completionHandler: @escaping (Result<[Topic], Error>) -> Void) {
         AF.request(
             api.endPoint,
