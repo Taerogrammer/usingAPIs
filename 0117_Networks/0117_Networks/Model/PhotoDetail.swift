@@ -15,24 +15,19 @@ struct PhotoDetail: Decodable {
 
 struct Downloads: Decodable {
     let total: Int
-    let historical: DownloadsHistory
-}
-
-struct DownloadsHistory: Decodable {
-    let values: [HistoryValue]
-}
-
-struct DownloadsValue: Decodable {
-    let date: String
-    let value: Int
+    let historical: HistoryList
 }
 
 struct Views: Decodable {
     let total: Int
-    let historical: ViewsHistory
+    let historical: HistoryList
 }
 
-struct ViewsHistory: Decodable {
+struct HistoryList: Decodable {
+    let values: [HistoryValue]
+}
+
+struct DownloadsHistory: Decodable {
     let values: [HistoryValue]
 }
 
