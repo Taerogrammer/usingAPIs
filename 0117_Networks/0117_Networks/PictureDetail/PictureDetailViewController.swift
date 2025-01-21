@@ -25,6 +25,16 @@ final class PictureDetailViewController: UIViewController {
     private let chartLabel = UILabel()
     private let segmentedControl = UISegmentedControl()
 
+    private var chartHostingController: UIHostingController<ChartView>?
+
+    var historyData: [HistoryValue] = [] {
+        didSet {
+            updateChartView()
+        }
+    }
+
+    private var photoDetail: PhotoDetail?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(), configureLayout(), configureView(), configureChartView()].forEach { $0 }
@@ -105,6 +115,7 @@ extension PictureDetailViewController: ViewConfiguration {
     func configureDetail(with detail: PhotoDetail) {
         downloadsText.text = "\(detail.downloads.total.formatted())"
         viewsText.text = "\(detail.views.total.formatted())"
+        historyData = detail.views.historical.values
     }
 
     func configureImage(with photoId: String) {
@@ -116,23 +127,31 @@ extension PictureDetailViewController: ViewConfiguration {
 // MARK: Chart
 extension PictureDetailViewController {
     private func configureChartView() {
-        let controller = UIHostingController(rootView: ChartView())
-        guard let chartView = controller.view else { return }
-        contentView.addSubview(chartView)
+        let chartView = ChartView(data: historyData)
+        let controller = UIHostingController(rootView: chartView)
+        self.chartHostingController = controller
 
-        chartView.snp.makeConstraints { make in
+        guard let chartUIView = controller.view else { return }
+        contentView.addSubview(chartUIView)
+
+        chartUIView.snp.makeConstraints { make in
             make.top.equalTo(chartLabel.snp.bottom).offset(24)
             make.width.equalTo(contentView)
             make.bottom.equalTo(contentView).inset(60)
             make.height.equalTo(500)
         }
     }
+    private func updateChartView() {
+        let updatedChartView = ChartView(data: historyData)
+        chartHostingController?.rootView = updatedChartView
+    }
 }
 
 // MARK: @objc
 extension PictureDetailViewController {
     @objc func segmentedTapped(segment: UISegmentedControl) {
-        print(#function, segment.selectedSegmentIndex)
-
+        guard let detail = photoDetail else { return }
+        let isViews = segment.selectedSegmentIndex == 0
+        historyData = isViews ? detail.views.historical.values : detail.downloads.historical.values
     }
 }

@@ -169,6 +169,7 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
             case .success(let success):
                 detailVC.configureDetail(with: success)
                 detailVC.configureImage(with: selectedPicture.urls.small)
+                detailVC.historyData = success.views.historical.values
                 self.navigationController?.pushViewController(detailVC, animated: true)
             case .failure(let failure):
                 print("error -> ", failure)

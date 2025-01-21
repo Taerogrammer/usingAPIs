@@ -19,7 +19,7 @@ struct Downloads: Decodable {
 }
 
 struct DownloadsHistory: Decodable {
-    let values: [DownloadsValue]
+    let values: [HistoryValue]
 }
 
 struct DownloadsValue: Decodable {
