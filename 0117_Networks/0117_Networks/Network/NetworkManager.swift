@@ -13,17 +13,20 @@ final class NetworkManager {
     private init() { }
     private let display = 20
 
-    // 정보 불러오기
-    func fetchItem(query: String, page: Int, sort: String = "relevant", completion: @escaping (Result<PictureSearch, Error>) -> Void) {
-        let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&per_page=\(display)&order_by=\(sort)&client_id=\(APIKey.unsplash.rawValue)"
-        print(#function, url)
-        
-        AF.request(url, method: .get)
-            .responseDecodable(of: PictureSearch.self) { response in
-                completion(response.result.mapError { $0 as Error })
-            }
+    // 정보 불러오기 test
+    func fetchItem(api: UnsplashRequest, completionHandler: @escaping (Result<PictureSearch, Error>) -> Void) {
+        AF.request(
+            api.endPoint,
+            method: api.method,
+            parameters: api.parameter,
+            encoding: URLEncoding(destination: .queryString))
+        .validate(statusCode: 200..<500)
+        .responseDecodable(of: PictureSearch.self) { response in
+            completionHandler(response.result.mapError { $0 as Error })
+        }
     }
-    
+
+
     // 색상을 기준으로 정보 불러오기
     func fetchColorItem(query: String, page: Int, sort: String = "relevant", color: String, completion: @escaping (Result<PictureSearch, Error>) -> Void) {
         let url = "\(SplashAPI.search.rawValue)&query=\(query)&page=\(page)&order_by=\(sort)&color=\(color)&client_id=\(APIKey.unsplash.rawValue)"
