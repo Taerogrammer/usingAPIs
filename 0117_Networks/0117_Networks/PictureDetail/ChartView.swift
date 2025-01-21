@@ -20,6 +20,7 @@ struct ChartView: View {
                         y: .value("Value", data[index].value)
                     )
                     .foregroundStyle(.blue)
+                    .shadow(color: .accentColor, radius: 3)
                 }
             }
         }
