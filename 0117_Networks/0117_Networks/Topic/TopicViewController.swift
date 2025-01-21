@@ -19,6 +19,7 @@ final class TopicViewController: UIViewController {
         }
     }
     private var unsplashTopicData = UnsplashTopic(topicID: "", page: 1)
+    private var unsplashStatistics = UnsplashStatistics(imageId: "")
 
     private let topicsTest: [String] = ["건축 및 인테리어", "골든 아워", "배경 화면", "자연", "3D 렌더링", "여행하다", "텍스쳐 및 패턴", "거리 사진", "필름", "기록의", "실험적인", "동물", "패션 및 뷰티", "사람", "비즈니스 및 업무", "식음료"]
 
@@ -145,15 +146,15 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailVC = PictureDetailViewController()
-
-        NetworkManager.shared.fetchPhotoDetail(photoId: topicImages[indexPath.section][indexPath.item].id) { result in
+        unsplashStatistics.imageId = topicImages[indexPath.section][indexPath.item].id
+        NetworkManager.shared.fetchStatistic(api: unsplashStatistics.toRequest()) { result in
             switch result {
-            case .success(let value):
+            case .success(let success):
                 detailVC.configureImage(with: self.topicImages[indexPath.section][indexPath.item].urls.small)
-                detailVC.configureDetail(with: value)
+                detailVC.configureDetail(with: success)
                 self.navigationController?.pushViewController(detailVC, animated: true)
-            case .failure(let error):
-                print("에러 -> ", error)
+            case .failure(let failure):
+                print("error -> ", failure)
             }
         }
     }
