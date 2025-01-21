@@ -18,6 +18,7 @@ final class TopicViewController: UIViewController {
             if topics.count == 3 { fetchTopics() }
         }
     }
+    private var unsplashTopicData = UnsplashTopic(topicID: "", page: 1)
 
     private let topicsTest: [String] = ["건축 및 인테리어", "골든 아워", "배경 화면", "자연", "3D 렌더링", "여행하다", "텍스쳐 및 패턴", "거리 사진", "필름", "기록의", "실험적인", "동물", "패션 및 뷰티", "사람", "비즈니스 및 업무", "식음료"]
 
@@ -175,23 +176,25 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
 
 // MARK: Methods
 extension TopicViewController {
+
     private func fetchTopics() {
         // DispatchGroup으로 묶어 Task 그룹화
         let dispatchGroup = DispatchGroup()
         for (index, topic) in topics.enumerated() {
             guard let convertedTopic = topicEnglish[topic] else { return }
             // 그룹화 Task 시작
+            unsplashTopicData = .init(topicID: convertedTopic, page: 1)
+
             dispatchGroup.enter()
-            NetworkManager.shared.fetchTopic(topic: convertedTopic) { [weak self] result in
-                // 끝나는 시점을 정확히 모르는 경우
-                // defer: 해당 블럭의 마지막에 실행
+            NetworkManager.shared.fetchTopic(api: unsplashTopicData.toRequest()) { result in
+
                 defer { dispatchGroup.leave() }
 
                 switch result {
-                case .success(let value):
-                    self?.topicImages[index] = value
-                case .failure(let error):
-                    print("error -> ", error)
+                case .success(let success):
+                    self.topicImages[index] = success
+                case .failure(let failure):
+                    print("error -> ??", failure)
                 }
             }
         }

@@ -8,13 +8,6 @@
 import Foundation
 import Alamofire
 
-/// API 리스트
-enum SplashAPI: String {
-    case topic = "https://api.unsplash.com/topics/"
-    case search = "https://api.unsplash.com/search/photos?"
-    case detail = "https://api.unsplash.com/photos/"
-}
-
 enum SortType: String {
     case relevant = "relevant" // 관련순 (기본값)
     case latest = "latest"     // 최신순
@@ -30,7 +23,7 @@ enum UnsplashRequest {
     var endPoint: URL {
         switch self {
         case .topic(let topicID, _):
-            return URL(string: baseUrl + "/topics\(topicID)/photos")!
+            return URL(string: baseUrl + "/topics/\(topicID)/photos")!
         case .search(_, _, _, _, _):
             return URL(string: baseUrl + "/search/photos")!
         case .statistics(let imageId):

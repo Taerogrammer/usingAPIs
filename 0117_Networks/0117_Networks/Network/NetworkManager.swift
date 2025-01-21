@@ -35,13 +35,16 @@ final class NetworkManager {
                 completion(response.result.mapError { $0 as Error })
             }
     }
-    
-    // topic
-    func fetchTopic(topic: String, completion: @escaping (Result<[Topic], Error>) -> Void) {
-        let url = "https://api.unsplash.com/topics/\(topic)/photos?&page=1&client_id=\(APIKey.unsplash.rawValue)"
-        AF.request(url, method: .get)
-            .responseDecodable(of: [Topic].self) { response in
-                completion(response.result.mapError { $0 as Error })
-            }
+
+    func fetchTopic(api: UnsplashRequest, completionHandler: @escaping (Result<[Topic], Error>) -> Void) {
+        AF.request(
+            api.endPoint,
+            method: api.method,
+            parameters: api.parameter,
+            encoding: URLEncoding(destination: .queryString))
+        .validate(statusCode: 200..<500)
+        .responseDecodable(of: [Topic].self) { response in
+            completionHandler(response.result.mapError { $0 as Error })
+        }
     }
 }
