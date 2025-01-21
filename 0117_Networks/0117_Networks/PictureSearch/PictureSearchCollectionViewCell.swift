@@ -63,7 +63,7 @@ extension PictureSearchCollectionViewCell: ViewConfiguration {
         likeImageView.tintColor = .white
     }
     func configureItem(with row: PictureResult) {
-        guard let url = URL(string: row.urls.raw) else { return }
+        guard let url = URL(string: row.urls.small) else { return }
         let imageSize: CGSize = imgView.frame.size
 
         DispatchQueue.global(qos: .userInitiated).async {
