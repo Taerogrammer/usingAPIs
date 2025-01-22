@@ -63,9 +63,15 @@ final class NetworkManager {
             parameters: api.parameter,
             encoding: URLEncoding(destination: .queryString))
             .cURLDescription { print($0) }
-            .validate(statusCode: 200..<500)
             .responseDecodable(of: T.self) { response in
-            completionHandler(response.result.mapError { $0 as Error })
+                switch response.result {
+                case .success(let data):
+                    completionHandler(.success(data))
+                case .failure(_):
+                    let statusCode = response.response?.statusCode ?? 503
+                    let unsplashError = UnsplashError(rawValue: statusCode) ?? .unknown
+                    completionHandler(.failure(unsplashError))
+                }
         }
     }
 }

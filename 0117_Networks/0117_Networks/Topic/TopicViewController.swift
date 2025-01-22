@@ -196,6 +196,14 @@ extension TopicViewController {
                     self.topicImages[index] = success
                 case .failure(let failure):
                     print("error -> ", failure)
+                    // 에러가 UnsplashError인지 확인 후 메시지 출력
+                    if let unsplashError = failure as? UnsplashError {
+                        let alert = UIAlertController.setErrorAlert(unsplashError.errorMessage)
+                        self.present(alert, animated: true, completion: nil)
+                    } else {
+                        let alert = UIAlertController.setErrorAlert("알 수 없는 에러")
+                        self.present(alert, animated: true, completion: nil)
+                    }
                 }
             }
         }
