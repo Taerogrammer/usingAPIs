@@ -212,18 +212,17 @@ extension PictureSearchViewController: UISearchBarDelegate {
         resetButton()
         resetPage()
         unsplashData = .init(query: searchBar.text!, page: self.page, per_page: 20)
-
-        NetworkManager.shared.fetchItem(api: unsplashData.toRequest()) { result in
+        NetworkManager.shared.fetchItem(api: unsplashData.toRequest(), type: PictureSearch.self) { result in
             switch result {
-            case .success(let value):
-                self.pictureSearch = value
-                self.totalPages = value.totalPages
+            case .success(let success):
+                self.pictureSearch = success
+                self.totalPages = success.totalPages
                 self.items = self.pictureSearch?.results ?? []
             case .failure(let failure):
                 print("실패 -> ", failure)
             }
-        }
 
+        }
         view.endEditing(true)
     }
 }
@@ -244,7 +243,8 @@ extension PictureSearchViewController {
         resetPage()
         scrollCollectionView()
         unsplashData = .init(query: searchBar.text!, page: self.page, per_page: 20, color: english)
-        NetworkManager.shared.fetchItem(api: unsplashData.toRequest()) { result in
+        NetworkManager.shared.fetchItem(api: unsplashData.toRequest(),
+                                        type: PictureSearch.self) { result in
             switch result {
             case .success(let success):
                 self.pictureSearch = success
@@ -293,13 +293,14 @@ extension PictureSearchViewController {
         resetPage()
 
         unsplashData = .init(query: query, page: self.page, per_page: 20, order_by: currentSortType.rawValue)
-        NetworkManager.shared.fetchItem(api: unsplashData.toRequest()) { result in
+        NetworkManager.shared.fetchItem(api: unsplashData.toRequest(),
+                                        type: PictureSearch.self) { result in
             switch result {
-            case .success(let value):
-                self.pictureSearch = value
+            case .success(let success):
+                self.pictureSearch = success
                 self.items = self.pictureSearch?.results ?? []
-            case .failure(let error):
-                print("error -> ", error)
+            case .failure(let failure):
+                print("error -> ", failure)
             }
         }
         print(#function, currentSortType.rawValue)
@@ -313,12 +314,13 @@ extension PictureSearchViewController {
         self.page += 1
 
         unsplashData = .init(query: query, page: self.page, per_page: 20, order_by: currentSortType.rawValue)
-        NetworkManager.shared.fetchItem(api: unsplashData.toRequest()) { result in
+        NetworkManager.shared.fetchItem(api: unsplashData.toRequest(),
+                                        type: PictureSearch.self) { result in
             switch result {
             case .success(let success):
                 self.items?.append(contentsOf: success.results)
             case .failure(let failure):
-                print("error -> ", failure)
+                print("error ", failure)
             }
             self.isFetching = false
         }
