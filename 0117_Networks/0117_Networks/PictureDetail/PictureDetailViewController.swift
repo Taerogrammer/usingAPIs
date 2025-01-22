@@ -146,7 +146,7 @@ extension PictureDetailViewController {
 
 // MARK: @objc
 extension PictureDetailViewController {
-    @objc func segmentedTapped(_ segment: UISegmentedControl) {
+    @objc private func segmentedTapped(_ segment: UISegmentedControl) {
         let isViews = segment.selectedSegmentIndex == 0
         historyData = isViews ? viewData : downloadData
         updateChartView()
