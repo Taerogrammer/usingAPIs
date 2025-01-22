@@ -147,7 +147,8 @@ extension TopicViewController: UICollectionViewDelegate, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailVC = PictureDetailViewController()
         unsplashStatistics.imageId = topicImages[indexPath.section][indexPath.item].id
-        NetworkManager.shared.fetchStatistic(api: unsplashStatistics.toRequest()) { result in
+        NetworkManager.shared.fetchItem(api: unsplashStatistics.toRequest(),
+                                        type: PhotoDetail.self) { result in
             switch result {
             case .success(let success):
                 detailVC.configureImage(with: self.topicImages[indexPath.section][indexPath.item].urls.small)
@@ -187,15 +188,14 @@ extension TopicViewController {
             unsplashTopicData = .init(topicID: convertedTopic, page: 1)
 
             dispatchGroup.enter()
-            NetworkManager.shared.fetchTopic(api: unsplashTopicData.toRequest()) { result in
-
+            NetworkManager.shared.fetchItem(api: unsplashTopicData.toRequest(),
+                                            type: [Topic].self) { result in
                 defer { dispatchGroup.leave() }
-
                 switch result {
                 case .success(let success):
                     self.topicImages[index] = success
                 case .failure(let failure):
-                    print("error -> ??", failure)
+                    print("error -> ", failure)
                 }
             }
         }

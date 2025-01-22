@@ -164,7 +164,19 @@ extension PictureSearchViewController: UICollectionViewDelegate, UICollectionVie
         guard let selectedPicture = items?[indexPath.item] else { return }
         unsplashStatistics.imageId = selectedPicture.id
         let detailVC = PictureDetailViewController()
-        NetworkManager.shared.fetchStatistic(api: unsplashStatistics.toRequest()) { result in
+//        NetworkManager.shared.fetchStatistic(api: unsplashStatistics.toRequest()) { result in
+//            switch result {
+//            case .success(let success):
+//                detailVC.configureDetail(with: success)
+//                detailVC.configureImage(with: selectedPicture.urls.small)
+//                self.navigationController?.pushViewController(detailVC, animated: true)
+//            case .failure(let failure):
+//                print("error -> ", failure)
+//            }
+//        }
+
+        NetworkManager.shared.fetchItem(api: unsplashStatistics.toRequest(),
+                                        type: PhotoDetail.self) { result in
             switch result {
             case .success(let success):
                 detailVC.configureDetail(with: success)
