@@ -43,6 +43,7 @@ final class PictureSearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(),configureLayout(), configureView(), configureScrollButton(), configureDelegate()].forEach { $0 }
+//        view.backgroundColor = .defaultColor
     }
 }
 
@@ -102,7 +103,7 @@ extension PictureSearchViewController: ViewConfiguration {
     private func ScrollButton(title: String, tintColor: UIColor) -> UIButton {
         let button = UIButton()
         button.setTitle(title, for: .normal)
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.defaultTextColor, for: .normal)
         button.setImage(UIImage(systemName: "circle.fill"), for: .normal)
         button.tintColor = tintColor
         button.contentEdgeInsets = .init(top: 2, left: 6, bottom: 2, right: 12)

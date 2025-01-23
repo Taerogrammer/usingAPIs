@@ -32,6 +32,7 @@ final class PictureDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(), configureLayout(), configureView(), configureChartView()].forEach { $0 }
+        view.backgroundColor = .defaultBackgroundColor
     }
 }
 

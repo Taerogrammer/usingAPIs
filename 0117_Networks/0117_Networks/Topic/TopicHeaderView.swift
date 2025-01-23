@@ -37,7 +37,7 @@ extension TopicHeaderView: ViewConfiguration {
     
     func configureView() {
         titleLabel.font = .boldSystemFont(ofSize: 20)
-        titleLabel.textColor = .black
+        titleLabel.textColor = .defaultTextColor
     }
     func configureHeaderTitle(title: String) {
         titleLabel.text = title

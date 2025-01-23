@@ -51,6 +51,7 @@ final class TopicViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         [configureHierarchy(), configureLayout(), configureView(), configureDelegate(), fetchTopics(), configureRefreshControl()].forEach { $0 }
+        view.backgroundColor = .defaultBackgroundColor
     }
 }
 
